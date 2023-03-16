@@ -1,0 +1,21 @@
+body {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  flex-direction: row;
+  justify-content: center;
+  margin: 0;
+
+  background-color: #16161dff;
+
+  user-select: none;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+
+canvas {
+  background-color: aliceblue;
+}
