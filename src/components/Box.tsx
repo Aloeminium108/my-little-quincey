@@ -9,13 +9,11 @@ function Box(props: ThreeElements['mesh']) {
   //useFrame((state, delta) => (ref.current.rotation.x += delta))
   
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
-    e.stopPropagation()
     ref.current.position.x = e.point.x
     ref.current.position.y = e.point.y
   }
 
   const handlePointerMove = (e: ThreeEvent<PointerEvent>) => {
-    e.stopPropagation()
     if (e.buttons === 1) {
       handlePointerDown(e)
     }
