@@ -1,16 +1,15 @@
 import * as THREE from 'three'
 import { useRef, useState } from 'react'
 import { ThreeElements, ThreeEvent } from '@react-three/fiber'
+import { useBox } from '@react-three/cannon'
+import { BufferGeometry, Mesh } from 'three'
 
-function Box(props: ThreeElements['mesh']) {
-  const ref = useRef<THREE.Mesh>(null!)
-  const [hovered, hover] = useState(false)
+function Box(props: any) {
 
-  //useFrame((state, delta) => (ref.current.rotation.x += delta))
-  
+  const [ref, api] = useBox(() => ({mass: 1, ...props}))
+
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
-    ref.current.position.x = e.point.x
-    ref.current.position.y = e.point.y
+    api.position.set(e.point.x, e.point.y, ref.current!!.position.z)
   }
 
   const handlePointerMove = (e: ThreeEvent<PointerEvent>) => {
@@ -21,16 +20,13 @@ function Box(props: ThreeElements['mesh']) {
 
   return (
     <mesh
-      {...props}
-      ref={ref}
-      onPointerOver={(e) => hover(true)}
-      onPointerOut={(e) => hover(false)}
+      ref={ref as React.RefObject<Mesh<BufferGeometry>>}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
     >
 
       <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
+      <meshStandardMaterial color={'orange'} />
 
     </mesh>
   )
