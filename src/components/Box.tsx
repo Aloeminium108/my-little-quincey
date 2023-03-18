@@ -10,6 +10,7 @@ function Box(props: any) {
 
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
     api.position.set(e.point.x, e.point.y, ref.current!!.position.z)
+    api.velocity.set(0, 0, 0)
   }
 
   const handlePointerMove = (e: ThreeEvent<PointerEvent>) => {
