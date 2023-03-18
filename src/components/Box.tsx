@@ -9,11 +9,13 @@ function Box(props: any) {
   const [ref, api] = useBox(() => ({mass: 1, ...props}))
 
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
+    e.stopPropagation()
     api.position.set(e.point.x, e.point.y, ref.current!!.position.z)
     api.velocity.set(0, 0, 0)
   }
 
   const handlePointerMove = (e: ThreeEvent<PointerEvent>) => {
+    e.stopPropagation()
     if (e.buttons === 1) {
       handlePointerDown(e)
     }
