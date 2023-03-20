@@ -6,11 +6,11 @@ Command: npx gltfjsx@6.1.4 -t ./public/models/conical-creature.glb
 import * as THREE from 'three'
 import React, { useRef } from 'react'
 import { useBounds, useGLTF } from '@react-three/drei'
-import { GLTF } from 'three-stdlib'
+import { GLTF, mergeVertices } from 'three-stdlib'
 import { ShapeResult, ShapeType, threeToCannon } from 'three-to-cannon'
 import { Triplet, useBox, useCompoundBody, useConvexPolyhedron, useCylinder, useSphere } from '@react-three/cannon'
 import { BufferGeometry, Mesh } from 'three'
-import { Box, ConvexPolyhedron, Shape, Vec3 } from 'cannon-es'
+import { Box, ConvexPolyhedron, Material, Shape, Vec3 } from 'cannon-es'
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -38,12 +38,16 @@ export function ConicalCreature(props: any) {
     ...props
   }))
 
+  const geometry = mergeVertices(nodes.Cone.geometry)
+  geometry.computeVertexNormals()
+
   return (
     <group dispose={null}>
       <mesh 
         ref={ref as React.RefObject<Mesh<BufferGeometry>>}
-        geometry={nodes.Cone.geometry} 
+        geometry={geometry} 
         material={nodes.Cone.material}
+        
       />
     </group>
   )

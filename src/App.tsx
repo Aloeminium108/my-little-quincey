@@ -6,6 +6,7 @@ import Box from "./components/Box";
 import Floor from "./components/Floor";
 import Quincey from "./components/Quincey";
 import ConicalCreature from "./components/Conical-creature";
+import ConicalCreature2 from "./components/Conical-creature2";
 
 class App extends React.Component {
   render() {
@@ -19,6 +20,7 @@ class App extends React.Component {
             <Debug color="green" >
               <Floor position={[0, -2, 0]} />
               <ConicalCreature position={[-3, 0, 0]} />
+              <ConicalCreature2 />
             </Debug>
           </Physics>
         </Canvas>
