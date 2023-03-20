@@ -16,10 +16,10 @@ class App extends React.Component {
           <ambientLight />
           <pointLight position={[10, 10, 10]} />
           <Physics>
-          <Debug color="green" >
-            <Floor position={[0, -2, 0]} />
-            <ConicalCreature />
-          </Debug>
+            <Debug color="green" >
+              <Floor position={[0, -2, 0]} />
+              <ConicalCreature position={[-3, 0, 0]} />
+            </Debug>
           </Physics>
         </Canvas>
       </>

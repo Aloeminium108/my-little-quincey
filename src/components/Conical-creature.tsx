@@ -19,14 +19,14 @@ type GLTFResult = GLTF & {
   materials: {}
 }
 
-export function ConicalCreature(props: JSX.IntrinsicElements['group']) {
+export function ConicalCreature(props: any) {
   const { nodes, materials } = useGLTF('/models/conical-creature.glb') as GLTFResult
 
   // const {shape, offset, orientation} = threeToCannon(nodes.Cone, {type: ShapeType.BOX})!!
 
   // const [ref, api] = useBox(() => ({mass: 0, rotation: [-1.68, 0, 0], args: (shape as Box).halfExtents.scale(2).toArray()}))
 
-  const {shape} = threeToCannon(nodes.Cone, {type: ShapeType.HULL})!!
+  const {shape, offset} = threeToCannon(nodes.Cone, {type: ShapeType.HULL})!!
 
   const vertices = (shape as ConvexPolyhedron).vertices
   const faces = (shape as ConvexPolyhedron).faces
@@ -34,11 +34,12 @@ export function ConicalCreature(props: JSX.IntrinsicElements['group']) {
   const [ref, api] = useConvexPolyhedron(() => ({
     mass: 1, 
     rotation: [-1.68, 0, 0], 
-    args: [vertices.map(vertex => vertex.toArray()), faces] 
+    args: [vertices.map(vertex => vertex.toArray()), faces],
+    ...props
   }))
 
   return (
-    <group {...props} dispose={null}>
+    <group dispose={null}>
       <mesh 
         ref={ref as React.RefObject<Mesh<BufferGeometry>>}
         geometry={nodes.Cone.geometry} 
