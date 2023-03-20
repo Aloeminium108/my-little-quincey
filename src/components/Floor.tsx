@@ -13,7 +13,7 @@ function Floor(props: any) {
     >
 
       <planeGeometry args={[50, 50]} />
-      <meshStandardMaterial color={'black'} />
+      <meshStandardMaterial color={'white'} />
 
     </mesh>
   )
