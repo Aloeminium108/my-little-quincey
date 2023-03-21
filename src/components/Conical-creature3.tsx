@@ -7,12 +7,13 @@ import * as THREE from 'three'
 import React, { useEffect } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
-import { AnimationClip } from 'three'
+import { AnimationClip, Vector3 } from 'three'
 import { ShapeType, threeToCannon } from 'three-to-cannon'
 import { ConvexPolyhedron } from 'cannon-es'
 import { useConvexPolyhedron } from '@react-three/cannon'
-import { ThreeElements, useThree } from '@react-three/fiber'
-import { useGesture } from 'react-use-gesture'
+import { ThreeElements, ThreeEvent, useThree } from '@react-three/fiber'
+import { useDrag, useGesture } from 'react-use-gesture'
+import { updateExpressionWithTypeArguments } from 'typescript'
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -24,6 +25,15 @@ type GLTFResult = GLTF & {
   materials: {
     ['Material.001']: THREE.MeshStandardMaterial
   }
+}
+
+type GestureEvent = {
+  drag: ThreeEvent<PointerEvent>
+  wheel: ThreeEvent<PointerEvent>
+  scroll: ThreeEvent<PointerEvent>
+  move: ThreeEvent<PointerEvent>
+  hover: ThreeEvent<PointerEvent>
+  pinch: ThreeEvent<PointerEvent>
 }
 
 export function ConicalCreature3(props: any) {
@@ -46,13 +56,20 @@ export function ConicalCreature3(props: any) {
     actions.Walk1?.play()
   }, [])
 
-  const { size, viewport } = useThree()
-  const aspect = size.width / viewport.width
-
-  const bind = useGesture({
-    onDrag: ({ offset: [x, y] }) => {
+  const bind = useGesture<GestureEvent>({
+    onDrag: ({ event }) => {
       props.setControls(false)
-      api.position.set(x / aspect, -y / aspect, ref.current!!.position.z)
+
+      const dragDistance = 10
+  
+      const castDistance = event.point.distanceTo(event.camera.position)
+      const castOffset = event.point.sub(event.camera.position)
+      const clampedPosition = castOffset.multiplyScalar(dragDistance/castDistance)
+      const cameraPosition = new Vector3(...event.camera.position.toArray())
+      const newPosition = cameraPosition.add(clampedPosition)
+  
+      api.position.copy(newPosition)
+  
       api.velocity.set(0, 0, 0)
       api.mass.set(0)
     },
@@ -65,8 +82,8 @@ export function ConicalCreature3(props: any) {
   return (
     <group 
       ref={ref} 
-      {...bind()} 
       {...props}
+      {...bind()}
       dispose={null}
     >
       <group name="Scene">
