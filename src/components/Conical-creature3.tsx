@@ -62,11 +62,9 @@ export function ConicalCreature3(props: any) {
 
       const dragDistance = 10
   
-      const castDistance = event.point.distanceTo(event.camera.position)
-      const castOffset = event.point.sub(event.camera.position)
-      const clampedPosition = castOffset.multiplyScalar(dragDistance/castDistance)
+      const relativePosition = event.ray.direction.multiplyScalar(dragDistance)
       const cameraPosition = new Vector3(...event.camera.position.toArray())
-      const newPosition = cameraPosition.add(clampedPosition)
+      const newPosition = cameraPosition.add(relativePosition)
   
       api.position.copy(newPosition)
   
