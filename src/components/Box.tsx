@@ -1,6 +1,4 @@
-import * as THREE from 'three'
-import { useRef, useState } from 'react'
-import { ThreeElements, ThreeEvent } from '@react-three/fiber'
+import { ThreeEvent } from '@react-three/fiber'
 import { useBox } from '@react-three/cannon'
 import { BufferGeometry, Mesh } from 'three'
 

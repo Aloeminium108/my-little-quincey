@@ -1,6 +1,3 @@
-import * as THREE from 'three'
-import { useRef } from 'react'
-import { ThreeElements} from '@react-three/fiber'
 import { usePlane } from '@react-three/cannon'
 import { BufferGeometry, Mesh } from 'three'
 

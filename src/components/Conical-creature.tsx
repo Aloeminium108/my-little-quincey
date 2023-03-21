@@ -4,13 +4,13 @@ Command: npx gltfjsx@6.1.4 -t ./public/models/conical-creature.glb
 */
 
 import * as THREE from 'three'
-import React, { useRef } from 'react'
-import { useBounds, useGLTF } from '@react-three/drei'
+import React from 'react'
+import { useGLTF } from '@react-three/drei'
 import { GLTF, mergeVertices } from 'three-stdlib'
-import { ShapeResult, ShapeType, threeToCannon } from 'three-to-cannon'
-import { Triplet, useBox, useCompoundBody, useConvexPolyhedron, useCylinder, useSphere } from '@react-three/cannon'
+import {  ShapeType, threeToCannon } from 'three-to-cannon'
+import { useConvexPolyhedron } from '@react-three/cannon'
 import { BufferGeometry, Mesh } from 'three'
-import { Box, ConvexPolyhedron, Material, Shape, Vec3 } from 'cannon-es'
+import { ConvexPolyhedron } from 'cannon-es'
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -20,18 +20,14 @@ type GLTFResult = GLTF & {
 }
 
 export function ConicalCreature(props: any) {
-  const { nodes, materials } = useGLTF('/models/conical-creature.glb') as GLTFResult
+  const { nodes } = useGLTF('/models/conical-creature.glb') as GLTFResult
 
-  // const {shape, offset, orientation} = threeToCannon(nodes.Cone, {type: ShapeType.BOX})!!
-
-  // const [ref, api] = useBox(() => ({mass: 0, rotation: [-1.68, 0, 0], args: (shape as Box).halfExtents.scale(2).toArray()}))
-
-  const {shape, offset} = threeToCannon(nodes.Cone, {type: ShapeType.HULL})!!
+  const {shape} = threeToCannon(nodes.Cone, {type: ShapeType.HULL})!!
 
   const vertices = (shape as ConvexPolyhedron).vertices
   const faces = (shape as ConvexPolyhedron).faces
 
-  const [ref, api] = useConvexPolyhedron(() => ({
+  const [ref] = useConvexPolyhedron(() => ({
     mass: 1, 
     rotation: [-1.68, 0, 0], 
     args: [vertices.map(vertex => vertex.toArray()), faces],

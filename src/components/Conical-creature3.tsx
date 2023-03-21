@@ -4,16 +4,15 @@ Command: npx gltfjsx@6.1.4 -t ./public/models/conical-creature3.glb
 */
 
 import * as THREE from 'three'
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { AnimationClip, Vector3 } from 'three'
 import { ShapeType, threeToCannon } from 'three-to-cannon'
 import { ConvexPolyhedron } from 'cannon-es'
 import { useConvexPolyhedron } from '@react-three/cannon'
-import { ThreeElements, ThreeEvent, useThree } from '@react-three/fiber'
-import { useDrag, useGesture } from 'react-use-gesture'
-import { updateExpressionWithTypeArguments } from 'typescript'
+import { ThreeEvent } from '@react-three/fiber'
+import { useGesture } from 'react-use-gesture'
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -54,7 +53,7 @@ export function ConicalCreature3(props: any) {
   
   useEffect(() => {
     actions.Walk1?.play()
-  }, [])
+  })
 
   const bind = useGesture<GestureEvent>({
     onDrag: ({ event }) => {

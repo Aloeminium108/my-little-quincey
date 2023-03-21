@@ -24,13 +24,10 @@ type GLTFResult = GLTF & {
   }
 }
 
-type ActionName = 'headAction'
-type GLTFActions = Record<ActionName, THREE.AnimationAction>
 
 export function Quincey(props: JSX.IntrinsicElements['group']) {
   const group = useRef<THREE.Group>()
-  const { nodes, materials, animations } = useGLTF('/models/quincey.glb') as GLTFResult
-  const { actions } = useAnimations<AnimationClip>(animations, group)
+  const { nodes, materials } = useGLTF('/models/quincey.glb') as GLTFResult
   return (
     <group ref={group as React.Ref<THREE.Group>} {...props} dispose={null}>
       <group name="Scene">
