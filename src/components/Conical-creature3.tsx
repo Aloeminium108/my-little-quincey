@@ -4,13 +4,15 @@ Command: npx gltfjsx@6.1.4 -t ./public/models/conical-creature3.glb
 */
 
 import * as THREE from 'three'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { AnimationClip } from 'three'
 import { ShapeType, threeToCannon } from 'three-to-cannon'
 import { ConvexPolyhedron } from 'cannon-es'
 import { useConvexPolyhedron } from '@react-three/cannon'
+import { ThreeElements, useThree } from '@react-three/fiber'
+import { useGesture } from 'react-use-gesture'
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -24,13 +26,10 @@ type GLTFResult = GLTF & {
   }
 }
 
-type ActionName = 'Walk'
-type GLTFActions = Record<ActionName, THREE.AnimationAction>
-
 export function ConicalCreature3(props: any) {
   const { nodes, materials, animations } = useGLTF('/models/conical-creature3.glb') as GLTFResult
 
-  const {shape, offset} = threeToCannon(nodes.Cone, {type: ShapeType.HULL})!!
+  const { shape } = threeToCannon(nodes.Cone, {type: ShapeType.HULL})!!
 
   const vertices = (shape as ConvexPolyhedron).vertices
   const faces = (shape as ConvexPolyhedron).faces
@@ -38,7 +37,7 @@ export function ConicalCreature3(props: any) {
   const [ref, api] = useConvexPolyhedron(() => ({
     mass: 1, 
     args: [vertices.map(vertex => vertex.toArray()), faces],
-    ...props
+    position: props.position
   }))
 
   const { actions } = useAnimations<AnimationClip>(animations, ref)
@@ -47,8 +46,29 @@ export function ConicalCreature3(props: any) {
     actions.Walk1?.play()
   }, [])
 
+  const { size, viewport } = useThree()
+  const aspect = size.width / viewport.width
+
+  const bind = useGesture({
+    onDrag: ({ offset: [x, y] }) => {
+      props.setControls(false)
+      api.position.set(x / aspect, -y / aspect, ref.current!!.position.z)
+      api.velocity.set(0, 0, 0)
+      api.mass.set(0)
+    },
+    onDragEnd: () => {
+      props.setControls(true)
+      api.mass.set(1)
+    }
+  })
+
   return (
-    <group ref={ref} {...props} dispose={null}>
+    <group 
+      ref={ref} 
+      {...bind()} 
+      {...props}
+      dispose={null}
+    >
       <group name="Scene">
         <group name="Armature">
           <primitive object={nodes.Bone} />
@@ -59,6 +79,7 @@ export function ConicalCreature3(props: any) {
             geometry={nodes.Cone.geometry} 
             material={materials['Material.001']} 
             skeleton={nodes.Cone.skeleton} 
+            castShadow
           />
         </group>
       </group>
