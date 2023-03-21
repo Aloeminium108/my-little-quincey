@@ -42,7 +42,7 @@ export function ConicalCreature2(props: any) {
         ref={ref as React.RefObject<Mesh<BufferGeometry>>}
         geometry={nodes.Cone.geometry} 
         material={materials['Material.001']} 
-        rotation={[-1.64, 0, 0]} 
+        rotation={[-1.68, 0, 0]} 
       />
     </group>
   )
