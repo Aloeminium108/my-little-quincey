@@ -4,14 +4,14 @@ Command: npx gltfjsx@6.1.4 -t ./public/models/conical-creature3.glb
 */
 
 import * as THREE from 'three'
-import { useEffect } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
-import { GLTF } from 'three-stdlib'
+import { GLTF, SkeletonUtils } from 'three-stdlib'
 import { AnimationClip, Vector3 } from 'three'
 import { ShapeType, threeToCannon } from 'three-to-cannon'
-import { ConvexPolyhedron } from 'cannon-es'
-import { useConvexPolyhedron } from '@react-three/cannon'
-import { ThreeEvent, useFrame } from '@react-three/fiber'
+import { Box, ConvexPolyhedron, Cylinder } from 'cannon-es'
+import { useBox, useConvexPolyhedron, useCylinder } from '@react-three/cannon'
+import { ThreeEvent, useFrame, useGraph } from '@react-three/fiber'
 import { useGesture } from 'react-use-gesture'
 
 type GLTFResult = GLTF & {
@@ -36,31 +36,33 @@ type GestureEvent = {
 }
 
 export function ConicalCreature3(props: any) {
-  const { nodes, materials, animations } = useGLTF('/models/conical-creature3.glb') as GLTFResult
+  const { scene, animations } = useGLTF('/models/conical-creature3.glb') as GLTFResult
+  const copiedScene = useMemo(() => SkeletonUtils.clone(scene), [scene])
+  const { nodes, materials } = useGraph(copiedScene) as GLTFResult
 
-  const { shape } = threeToCannon(nodes.Cone, {type: ShapeType.HULL})!!
+  const { shape, offset } = threeToCannon(nodes.Cone, {type: ShapeType.BOX})!!
 
-  const vertices = (shape as ConvexPolyhedron).vertices
-  const faces = (shape as ConvexPolyhedron).faces
+  const box = (shape as Box).halfExtents
 
-  const [ref, api] = useConvexPolyhedron(() => ({
+  const [ref, api] = useBox(() => ({
     mass: 1, 
-    args: [vertices.map(vertex => vertex.toArray()), faces],
+    args: [box.x * 2, box.y * 2, box.z * 2],
     position: props.position
   }))
 
   const { actions } = useAnimations<AnimationClip>(animations, ref)
   
-  useEffect(() => {
-    actions.Walk1?.play()
-  })
+  const grabInfo = useRef<{held: Boolean, holdPosition: Vector3}>({held: false, holdPosition: new Vector3(0, 0, 0)})
 
-  let held = false
-  let holdPosition = new Vector3(0, 0, 0)
+  useEffect(() => {
+    nodes.Cone.geometry.translate(-offset!!.x/2, -offset!!.y/2, -offset!!.z/2)
+    actions.Walk1?.play()
+    api.angularDamping.set(1)
+  }, [ref, api])
 
   useFrame(() => {
-    if (held) {
-      const targetPosition = new Vector3(...holdPosition.toArray())
+    if (grabInfo.current.held) {
+      const targetPosition = new Vector3(...grabInfo.current.holdPosition.toArray())
       targetPosition.sub(ref.current!!.getWorldPosition(new Vector3(0, 0, 0))).multiplyScalar(10)
       api.velocity.copy(targetPosition)
     }
@@ -76,12 +78,12 @@ export function ConicalCreature3(props: any) {
       const cameraPosition = new Vector3(...event.camera.position.toArray())
       const newPosition = cameraPosition.add(relativePosition)
 
-      holdPosition.copy(newPosition)
-      held = true
+      grabInfo.current.holdPosition.copy(newPosition)
+      grabInfo.current.held = true
     },
     onDragEnd: () => {
       props.setControls(true)
-      held = false
+      grabInfo.current.held = false
     }
   })
 
@@ -89,6 +91,7 @@ export function ConicalCreature3(props: any) {
     <group 
       ref={ref} 
       {...props}
+
       {...bind()}
       dispose={null}
     >
