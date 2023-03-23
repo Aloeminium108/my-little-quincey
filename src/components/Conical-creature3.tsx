@@ -11,7 +11,7 @@ import { AnimationClip, Vector3 } from 'three'
 import { ShapeType, threeToCannon } from 'three-to-cannon'
 import { ConvexPolyhedron } from 'cannon-es'
 import { useConvexPolyhedron } from '@react-three/cannon'
-import { ThreeEvent } from '@react-three/fiber'
+import { ThreeEvent, useFrame } from '@react-three/fiber'
 import { useGesture } from 'react-use-gesture'
 
 type GLTFResult = GLTF & {
@@ -55,6 +55,17 @@ export function ConicalCreature3(props: any) {
     actions.Walk1?.play()
   })
 
+  let held = false
+  let holdPosition = new Vector3(0, 0, 0)
+
+  useFrame(() => {
+    if (held) {
+      const targetPosition = new Vector3(...holdPosition.toArray())
+      targetPosition.sub(ref.current!!.getWorldPosition(new Vector3(0, 0, 0))).multiplyScalar(10)
+      api.velocity.copy(targetPosition)
+    }
+  })
+
   const bind = useGesture<GestureEvent>({
     onDrag: ({ event }) => {
       props.setControls(false)
@@ -64,15 +75,13 @@ export function ConicalCreature3(props: any) {
       const relativePosition = event.ray.direction.multiplyScalar(dragDistance)
       const cameraPosition = new Vector3(...event.camera.position.toArray())
       const newPosition = cameraPosition.add(relativePosition)
-  
-      api.position.copy(newPosition)
-  
-      api.velocity.set(0, 0, 0)
-      api.mass.set(0)
+
+      holdPosition.copy(newPosition)
+      held = true
     },
     onDragEnd: () => {
       props.setControls(true)
-      api.mass.set(1)
+      held = false
     }
   })
 
