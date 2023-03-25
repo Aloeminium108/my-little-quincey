@@ -9,8 +9,8 @@ import { useGLTF, useAnimations } from '@react-three/drei'
 import { GLTF, SkeletonUtils } from 'three-stdlib'
 import { AnimationClip, Vector3 } from 'three'
 import { ShapeType, threeToCannon } from 'three-to-cannon'
-import { Box, ConvexPolyhedron, Cylinder } from 'cannon-es'
-import { useBox, useConvexPolyhedron, useCylinder } from '@react-three/cannon'
+import { Box } from 'cannon-es'
+import { useBox } from '@react-three/cannon'
 import { ThreeEvent, useFrame, useGraph } from '@react-three/fiber'
 import { useGesture } from 'react-use-gesture'
 
@@ -58,7 +58,7 @@ export function ConicalCreature3(props: any) {
     nodes.Cone.geometry.translate(-offset!!.x/2, -offset!!.y/2, -offset!!.z/2)
     actions.Walk1?.play()
     api.angularDamping.set(1)
-  }, [ref, api])
+  }, [])
 
   useFrame(() => {
     if (grabInfo.current.held) {
